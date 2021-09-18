@@ -26,8 +26,8 @@ list_of_currencies = [
  'SGD',
 ]
 
-
-@st.cache(suppress_st_warning=True)
+# https://docs.streamlit.io/en/stable/api.html?highlight=cache#streamlit.cache
+@st.cache(ttl=60*60*1, suppress_st_warning=True)
 def get_rate():
     latest_forex_dict = {}
     api_progress = st.progress(0)
@@ -59,7 +59,7 @@ def get_rate():
     api_progress.empty()
     return latest_forex_dict
 
-@st.cache(suppress_st_warning=True)
+@st.cache(ttl=60*60*1, suppress_st_warning=True)
 def get_compare_rate(currency1,currency2,start_date,end_date):
     forex_compare_dict = {}
     api_progress = st.progress(0)
