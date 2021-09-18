@@ -166,122 +166,125 @@ def create_tabs(list_of_tabs, default_tab=0):
 st.header("MYR Foreign Currency Exchange Rate")
 latest_forex_dict = get_rate()
 
-active_tab = create_tabs(
-    ["Exchange Rate", "About"],
-    default_tab=0,
-)
+# active_tab = create_tabs(
+#     ["Exchange Rate", "About"],
+#     default_tab=0,
+# )
 
-if active_tab == 'Exchange Rate':
-    st.write(
-        f"""<span style="color:#121f84;font-size:22px"> Latest exchange rate as of <b>"""+ latest_forex_dict["USD"]['date'].iloc[-1].strftime("%d %B %Y")+ """, 12pm</b> </span> """,
-        unsafe_allow_html=True,
-        )
+st.write(
+    f"""<span style="color:#121f84;font-size:22px"> Latest exchange rate as of <b>"""+ latest_forex_dict["USD"]['date'].iloc[-1].strftime("%d %B %Y")+ """, 12pm</b> </span> """,
+    unsafe_allow_html=True,
+    )
 
-    # -------------------------------------------------------------------------------
-    # Metric
-    # ------------------------------------------------------------------------------
-    # st.metric(label="Temperature", value="70 °F", delta="1.2 °F")
-    # st.write(latest_forex_dict.keys())
-    cols = st.columns(4)
+# -------------------------------------------------------------------------------
+# Metric
+# ------------------------------------------------------------------------------
+# st.metric(label="Temperature", value="70 °F", delta="1.2 °F")
+# st.write(latest_forex_dict.keys())
+cols = st.columns(4)
 
-    for lst in [list_of_currencies[:4], list_of_currencies[4:]]:
-        for col_ind, cur in enumerate(lst):
-            temp_df = latest_forex_dict[cur].copy()
-            latest_value = temp_df['middle_rate'].iloc[-1]
-            previous_value = temp_df['middle_rate'].iloc[-2]
-            cols[col_ind].metric(label=cur, value="{:.2f}".format(round(latest_value,2)), delta = "{:.3f}".format(round(latest_value-previous_value,3)) )
+for lst in [list_of_currencies[:4], list_of_currencies[4:]]:
+    for col_ind, cur in enumerate(lst):
+        temp_df = latest_forex_dict[cur].copy()
+        latest_value = temp_df['middle_rate'].iloc[-1]
+        previous_value = temp_df['middle_rate'].iloc[-2]
+        cols[col_ind].metric(label=cur, value="{:.2f}".format(round(latest_value,2)), delta = "{:.3f}".format(round(latest_value-previous_value,3)) )
 
-    st.write("***")
-    # -------------------------------------------------------------------------------
-    # Trend
-    # ------------------------------------------------------------------------------
-    st.subheader('Show latest exchange rate trend')
-    selected_currency = st.selectbox("Select a currency to view exchange rate trend:",list_of_currencies, 0)
+st.write("***")
+# -------------------------------------------------------------------------------
+# Trend
+# ------------------------------------------------------------------------------
+st.subheader('Show latest exchange rate trend')
+selected_currency = st.selectbox("Select a currency to view exchange rate trend:",list_of_currencies, 0)
 
-    chosen_df = latest_forex_dict[selected_currency]
+chosen_df = latest_forex_dict[selected_currency]
 
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=chosen_df['date'], y=chosen_df['middle_rate'], 
-        mode='lines', name = "middle_rate", line_color="blue",showlegend=False))
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=chosen_df['date'], y=chosen_df['middle_rate'], 
+    mode='lines', name = "middle_rate", line_color="blue",showlegend=False))
 
 
-    fig.add_trace(go.Scatter(x=chosen_df['date'], y=chosen_df['buying_rate'], 
-        line_dash='dot', name = "buying_rate",fill='tonexty',line_width=1,
-        line_color="grey",showlegend=False))
+fig.add_trace(go.Scatter(x=chosen_df['date'], y=chosen_df['buying_rate'], 
+    line_dash='dot', name = "buying_rate",fill='tonexty',line_width=1,
+    line_color="grey",showlegend=False))
 
-    fig.add_trace(go.Scatter(x=chosen_df['date'], y=chosen_df['selling_rate'], 
-        line_dash='dot', name = "selling_rate",fill='tonexty',line_width=0.3,
-        line_color="grey",showlegend=False))
+fig.add_trace(go.Scatter(x=chosen_df['date'], y=chosen_df['selling_rate'], 
+    line_dash='dot', name = "selling_rate",fill='tonexty',line_width=0.3,
+    line_color="grey",showlegend=False))
 
-    fig.update_layout(title={
-                'text': 'MYR exchange rate against '+ selected_currency,
-                'y':0.9,
-                'x':0.5,
-                'xanchor': 'center',
-                'yanchor': 'top'
-                },
-                hovermode='x',
-                # yaxis = {
-                #     'showticklabels':False
-                # },
-    #             xaxis_title = 'Month',
-    #             yaxis_title = 'Rate (%)',
-                # margin={"r":0,"t":80,"l":30,"b":0},
-                # height=600,width=1200,
+fig.update_layout(title={
+            'text': 'MYR exchange rate against '+ selected_currency,
+            'y':0.9,
+            'x':0.5,
+            'xanchor': 'center',
+            'yanchor': 'top'
+            },
+            hovermode='x',
+            # yaxis = {
+            #     'showticklabels':False
+            # },
+#             xaxis_title = 'Month',
+#             yaxis_title = 'Rate (%)',
+            # margin={"r":0,"t":80,"l":30,"b":0},
+            # height=600,width=1200,
+            )
+
+st.plotly_chart(fig,use_container_width=True)
+
+st.write("***")
+# -------------------------------------------------------------------------------
+# Comparison between two 
+# ------------------------------------------------------------------------------
+st.subheader("Compare exchange rate trend")
+with st.form("Compare"):
+    currency1 = st.selectbox("Select one currency to compare:",list_of_currencies, 0)
+    currency2 = st.selectbox("Select another currency to compare:",list_of_currencies, 3)
+    selected_date_range = st.date_input("Filter Date", value=[datetime.now().replace(day=1), datetime.now()],min_value=pd.to_datetime("1 Jan 2021"),max_value=datetime.now(), help = "Select date range to plot")
+    st.form_submit_button("Compare and Plot!")
+
+start_date, end_date = selected_date_range
+# st.write(start_date)
+# st.write(end_date)
+
+forex_compare_dict = get_compare_rate(currency1,currency2,start_date,end_date)
+fig = make_subplots(specs=[[{"secondary_y": True}]])
+
+
+
+fig.add_trace(go.Scatter(x=forex_compare_dict[currency1]['date'], y=forex_compare_dict[currency1]['middle_rate'], 
+    mode='lines', name = currency1+ " (LHS)", line_color="blue"))
+fig.add_trace(go.Scatter(x=forex_compare_dict[currency2]['date'], y=forex_compare_dict[currency2]['middle_rate'], 
+    mode='lines', name = currency2 + " (RHS)", line_color="red"),secondary_y=True)
+
+fig.update_layout(title={
+            'text': 'MYR exchange rate against '+ currency1 +" and " + currency2,
+            'y':0.9,
+            'x':0.5,
+            'xanchor': 'center',
+            'yanchor': 'top'
+            },
+            hovermode='x',
+            # yaxis = {
+            #     'showticklabels':False
+            # },
+#             xaxis_title = 'Month',
+#             yaxis_title = 'Rate (%)',
+            # margin={"r":0,"t":80,"l":30,"b":0},
+            height=500,
+            # width=200,
+            legend=dict(
+                    yanchor="top",
+                    y=0.99,
+                    xanchor="left",
+                    x=0.01
                 )
+            )
+fig.update_yaxes(title_text=currency1, secondary_y=False)
+fig.update_yaxes(title_text= currency2, secondary_y=True)
+st.plotly_chart(fig,use_container_width=True)
 
-    st.plotly_chart(fig,use_container_width=True)
+st.write("***")
 
-    st.write("***")
-    # -------------------------------------------------------------------------------
-    # Comparison between two 
-    # ------------------------------------------------------------------------------
-    st.subheader("Compare exchange rate trend")
-    with st.form("Compare"):
-        currency1 = st.selectbox("Select one currency to compare:",list_of_currencies, 0)
-        currency2 = st.selectbox("Select another currency to compare:",list_of_currencies, 3)
-        selected_date_range = st.date_input("Filter Date", value=[datetime.now().replace(day=1), datetime.now()],min_value=pd.to_datetime("1 Jan 2021"),max_value=datetime.now(), help = "Select date range to plot")
-        st.form_submit_button("Compare and Plot!")
-
-    start_date, end_date = selected_date_range
-    # st.write(start_date)
-    # st.write(end_date)
-
-    forex_compare_dict = get_compare_rate(currency1,currency2,start_date,end_date)
-    fig = make_subplots(specs=[[{"secondary_y": True}]])
-
-
-
-    fig.add_trace(go.Scatter(x=forex_compare_dict[currency1]['date'], y=forex_compare_dict[currency1]['middle_rate'], 
-        mode='lines', name = currency1+ " (LHS)", line_color="blue"))
-    fig.add_trace(go.Scatter(x=forex_compare_dict[currency2]['date'], y=forex_compare_dict[currency2]['middle_rate'], 
-        mode='lines', name = currency2 + " (RHS)", line_color="red"),secondary_y=True)
-
-    fig.update_layout(title={
-                'text': 'MYR exchange rate against '+ currency1 +" and " + currency2,
-                'y':0.9,
-                'x':0.5,
-                'xanchor': 'center',
-                'yanchor': 'top'
-                },
-                hovermode='x',
-                # yaxis = {
-                #     'showticklabels':False
-                # },
-    #             xaxis_title = 'Month',
-    #             yaxis_title = 'Rate (%)',
-                # margin={"r":0,"t":80,"l":30,"b":0},
-                height=500,
-                # width=200,
-                legend=dict(
-                        yanchor="top",
-                        y=0.99,
-                        xanchor="left",
-                        x=0.01
-                    )
-                )
-    fig.update_yaxes(title_text=currency1, secondary_y=False)
-    fig.update_yaxes(title_text= currency2, secondary_y=True)
-    st.plotly_chart(fig,use_container_width=True)
-elif active_tab == 'About':
-    pass
+with st.expander("About this page"):
+    st.markdown("Exchange rate on this page is taken from [BNM Open API](https://api.bnm.gov.my/explorer). \
+        \nThese rates are from the Interbank Foreign Exchange Market in Kuala Lumpur as at 12pm daily")
