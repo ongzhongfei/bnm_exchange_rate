@@ -231,7 +231,26 @@ fig.update_layout(title={
 
 st.plotly_chart(fig,use_container_width=True)
 
+
+#### Download to csv
+#### First combine all df
+list_to_csv = []
+for cur in latest_forex_dict.keys():
+    temp_df = latest_forex_dict[cur].copy()
+    temp_df.columns = [cur + '_' + col if 'rate' in col else col for col in temp_df.columns]
+    list_to_csv.append(temp_df)
+main_df = pd.DataFrame(data={'date':[]})
+for df in list_to_csv:
+    main_df =main_df.merge(df,on='date',how='outer')
+
+st.download_button(
+    label="Download latest exchange rate into csv",
+    data=main_df.set_index('date').to_csv().encode('utf-8'),
+    file_name="latest_exchange_rate.csv",
+    mime="text/csv"
+)
 st.write("***")
+
 # -------------------------------------------------------------------------------
 # Comparison between two 
 # ------------------------------------------------------------------------------
@@ -282,6 +301,25 @@ fig.update_layout(title={
 fig.update_yaxes(title_text=currency1, secondary_y=False)
 fig.update_yaxes(title_text= currency2, secondary_y=True)
 st.plotly_chart(fig,use_container_width=True)
+
+
+#### Download to csv
+#### First combine all df
+list_to_csv = []
+for cur in forex_compare_dict.keys():
+    temp_df = forex_compare_dict[cur].copy()
+    temp_df.columns = [cur + '_' + col if 'rate' in col else col for col in temp_df.columns]
+    list_to_csv.append(temp_df)
+main_df = pd.DataFrame(data={'date':[]})
+for df in list_to_csv:
+    main_df =main_df.merge(df,on='date',how='outer')
+
+st.download_button(
+    label="Download filtered exchange rate into csv",
+    data=main_df.set_index('date').to_csv().encode('utf-8'),
+    file_name="filtered_exchange_rate.csv",
+    mime="text/csv"
+)
 
 st.write("***")
 
