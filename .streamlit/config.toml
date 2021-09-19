@@ -177,16 +177,16 @@ keyPrefix = ""
 
 [theme]
 # Primary accent color for interactive elements.
-primaryColor ="#6eb52f"
+primaryColor ="#F63366"
 
 # Background color for the main content area.
-backgroundColor ="#f0f0f5"
+backgroundColor ="#0E1117"
 
 # Background color used for the sidebar and most interactive widgets.
-secondaryBackgroundColor ="#e0e0ef"
+secondaryBackgroundColor ="#3133F"
 
 # Color used for almost all text.
-textColor ="#262730"
+textColor ="#FAFAFA"
 
 # Font family for all text in the app, except code blocks. One of "sans serif", "serif", or "monospace".
 # Default: "sans serif"

@@ -227,6 +227,8 @@ fig.update_layout(title={
 #             yaxis_title = 'Rate (%)',
             # margin={"r":0,"t":80,"l":30,"b":0},
             # height=600,width=1200,
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
             )
 
 st.plotly_chart(fig,use_container_width=True)
@@ -296,7 +298,9 @@ fig.update_layout(title={
                     y=0.99,
                     xanchor="left",
                     x=0.01
-                )
+                ),
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
             )
 fig.update_yaxes(title_text=currency1, secondary_y=False)
 fig.update_yaxes(title_text= currency2, secondary_y=True)
