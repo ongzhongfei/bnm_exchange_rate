@@ -177,7 +177,7 @@ keyPrefix = ""
 
 [theme]
 # Primary accent color for interactive elements.
-primaryColor ="#F63366"
+primaryColor ="#6eb52f"
 
 # Background color for the main content area.
 backgroundColor ="#0E1117"

@@ -172,7 +172,7 @@ latest_forex_dict = get_rate()
 # )
 
 st.write(
-    f"""<span style="color:#121f84;font-size:22px"> Latest exchange rate as of <b>"""+ latest_forex_dict["USD"]['date'].iloc[-1].strftime("%d %B %Y")+ """, 12pm</b> </span> """,
+    f"""<span style="color:#FFF8DC;font-size:22px"> Latest exchange rate as of <b>"""+ latest_forex_dict["USD"]['date'].iloc[-1].strftime("%d %B %Y")+ """, 12pm</b> </span> """,
     unsafe_allow_html=True,
     )
 
@@ -201,7 +201,7 @@ chosen_df = latest_forex_dict[selected_currency]
 
 fig = go.Figure()
 fig.add_trace(go.Scatter(x=chosen_df['date'], y=chosen_df['middle_rate'], 
-    mode='lines', name = "middle_rate", line_color="blue",showlegend=False))
+    mode='lines', name = "middle_rate", line_color="cyan",showlegend=False))
 
 
 fig.add_trace(go.Scatter(x=chosen_df['date'], y=chosen_df['buying_rate'], 
@@ -230,7 +230,8 @@ fig.update_layout(title={
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
             )
-
+fig.update_xaxes(showgrid=False, zeroline=False)
+fig.update_yaxes(showgrid=False, zeroline=False)
 st.plotly_chart(fig,use_container_width=True)
 
 
@@ -273,9 +274,9 @@ fig = make_subplots(specs=[[{"secondary_y": True}]])
 
 
 fig.add_trace(go.Scatter(x=forex_compare_dict[currency1]['date'], y=forex_compare_dict[currency1]['middle_rate'], 
-    mode='lines', name = currency1+ " (LHS)", line_color="blue"))
+    mode='lines', name = currency1+ " (LHS)", line_color="#FFA15A"))
 fig.add_trace(go.Scatter(x=forex_compare_dict[currency2]['date'], y=forex_compare_dict[currency2]['middle_rate'], 
-    mode='lines', name = currency2 + " (RHS)", line_color="red"),secondary_y=True)
+    mode='lines', name = currency2 + " (RHS)", line_color="#FF97FF"),secondary_y=True)
 
 fig.update_layout(title={
             'text': 'MYR exchange rate against '+ currency1 +" and " + currency2,
@@ -304,6 +305,8 @@ fig.update_layout(title={
             )
 fig.update_yaxes(title_text=currency1, secondary_y=False)
 fig.update_yaxes(title_text= currency2, secondary_y=True)
+fig.update_xaxes(showgrid=False, zeroline=False)
+fig.update_yaxes(showgrid=False, zeroline=False)
 st.plotly_chart(fig,use_container_width=True)
 
 
