@@ -61,12 +61,13 @@ def get_rate():
 
 @st.cache(ttl=60*60*1, suppress_st_warning=True)
 def get_compare_rate(currency1,currency2,start_date,end_date):
-    forex_compare_dict = {}
-    api_progress = st.progress(0)
-    api_count = 0
-    api_caption = st.empty()
+
 
     try:
+        forex_compare_dict = {}
+        api_progress = st.progress(0)
+        api_count = 0
+        api_caption = st.empty()
         for cur in [currency1,currency2]:
             list_of_df = []
 
@@ -88,6 +89,10 @@ def get_compare_rate(currency1,currency2,start_date,end_date):
             df['date'] = pd.to_datetime(df['date'])
             forex_compare_dict[cur] = df
     except ValueError:
+        forex_compare_dict = {}
+        api_progress = st.progress(0)
+        api_count = 0
+        api_caption = st.empty()
         start_date = start_date + dateutil.relativedelta.relativedelta(months=-1)
         end_date = end_date + dateutil.relativedelta.relativedelta(months=-1)
         for cur in [currency1,currency2]:
