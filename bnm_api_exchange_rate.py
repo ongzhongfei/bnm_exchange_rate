@@ -82,13 +82,16 @@ def get_compare_rate(currency1,currency2,start_date,end_date):
                     eac_df = pd.DataFrame(response.json()['data']['rate'])
                     list_of_df.append(eac_df)
                 except:
-                    st.write(response.json())
+                    pass
+                    # st.write(response.json())
                 api_count += 1
                 api_progress.progress(api_count/(sum(1 for _ in months_between(start_date, end_date))*2))
             df = pd.concat(list_of_df)
             df['date'] = pd.to_datetime(df['date'])
             forex_compare_dict[cur] = df
     except ValueError:
+        api_progress.empty()
+        api_caption.empty()
         forex_compare_dict = {}
         api_progress = st.progress(0)
         api_count = 0
