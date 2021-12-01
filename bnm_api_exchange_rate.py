@@ -65,26 +65,51 @@ def get_compare_rate(currency1,currency2,start_date,end_date):
     api_progress = st.progress(0)
     api_count = 0
     api_caption = st.empty()
-    for cur in [currency1,currency2]:
-        list_of_df = []
 
-        for eac_date in months_between(start_date,end_date):
-            api_caption.caption("Getting " + cur +" "+ str(eac_date))
-            response = requests.get(f"https://api.bnm.gov.my/public/exchange-rate/"+cur.lower()+"/year/"+str(eac_date.year)+"/month/"+str(eac_date.month)+"?session=1200&quote=rm",
-            headers={
-            "Accept": "application/vnd.BNM.API.v1+json",
-            }
-            )
-            try:
-                eac_df = pd.DataFrame(response.json()['data']['rate'])
-                list_of_df.append(eac_df)
-            except:
-                st.write(response.json())
-            api_count += 1
-            api_progress.progress(api_count/(sum(1 for _ in months_between(start_date, end_date))*2))
-        df = pd.concat(list_of_df)
-        df['date'] = pd.to_datetime(df['date'])
-        forex_compare_dict[cur] = df
+    try:
+        for cur in [currency1,currency2]:
+            list_of_df = []
+
+            for eac_date in months_between(start_date,end_date):
+                api_caption.caption("Getting " + cur +" "+ str(eac_date))
+                response = requests.get(f"https://api.bnm.gov.my/public/exchange-rate/"+cur.lower()+"/year/"+str(eac_date.year)+"/month/"+str(eac_date.month)+"?session=1200&quote=rm",
+                headers={
+                "Accept": "application/vnd.BNM.API.v1+json",
+                }
+                )
+                try:
+                    eac_df = pd.DataFrame(response.json()['data']['rate'])
+                    list_of_df.append(eac_df)
+                except:
+                    st.write(response.json())
+                api_count += 1
+                api_progress.progress(api_count/(sum(1 for _ in months_between(start_date, end_date))*2))
+            df = pd.concat(list_of_df)
+            df['date'] = pd.to_datetime(df['date'])
+            forex_compare_dict[cur] = df
+    except ValueError:
+        start_date = start_date + dateutil.relativedelta.relativedelta(months=-1)
+        end_date = end_date + dateutil.relativedelta.relativedelta(months=-1)
+        for cur in [currency1,currency2]:
+            list_of_df = []
+
+            for eac_date in months_between(start_date,end_date):
+                api_caption.caption("Getting " + cur +" "+ str(eac_date))
+                response = requests.get(f"https://api.bnm.gov.my/public/exchange-rate/"+cur.lower()+"/year/"+str(eac_date.year)+"/month/"+str(eac_date.month)+"?session=1200&quote=rm",
+                headers={
+                "Accept": "application/vnd.BNM.API.v1+json",
+                }
+                )
+                try:
+                    eac_df = pd.DataFrame(response.json()['data']['rate'])
+                    list_of_df.append(eac_df)
+                except:
+                    st.write(response.json())
+                api_count += 1
+                api_progress.progress(api_count/(sum(1 for _ in months_between(start_date, end_date))*2))
+            df = pd.concat(list_of_df)
+            df['date'] = pd.to_datetime(df['date'])
+            forex_compare_dict[cur] = df
         
     api_progress.empty()
     api_caption.empty()
